@@ -108,11 +108,6 @@ func main() {
     }
 }
 
-func logMessage(message string) {
-    currentTime := time.Now().Format("2006-01-02 15:04:05")
-    fmt.Printf("[%s] %s\n", currentTime, message)
-}
-
 func updateWeatherStation(w http.ResponseWriter, r *http.Request) {
     // Parse query parameters
     query := r.URL.Query()
@@ -148,8 +143,13 @@ func updateWeatherStation(w http.ResponseWriter, r *http.Request) {
     indoorTemp.WithLabelValues(ID).Set(convertFahrenheitToCelsius(indoorTempValue))
     indoorHumidity.WithLabelValues(ID).Set(indoorHumidityValue)
 
-    fmt.Fprintf(w, "Metrics updated successfully")
+    fmt.Fprintf(w, "success")
 	logMessage("Metrics updated successfully")
+}
+
+func logMessage(message string) {
+    currentTime := time.Now().Format("2006-01-02 15:04:05")
+    fmt.Printf("[%s] %s\n", currentTime, message)
 }
 
 func parseFloat(value string) float64 {
