@@ -2,7 +2,11 @@ FROM golang:1.22.1-alpine AS builder
 
 WORKDIR /app
 
-COPY . .
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY *.go ./
 
 RUN go build -o weatherstation
 
