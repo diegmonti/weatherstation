@@ -14,6 +14,7 @@ import (
 
 var (
     mutex           sync.Mutex
+    updateCounter   prometheus.Counter
     baromin         *prometheus.GaugeVec
     temperature     *prometheus.GaugeVec
     dewptf          *prometheus.GaugeVec
@@ -31,6 +32,12 @@ func main() {
 	registry := prometheus.NewRegistry()
 
     // Initialize Prometheus metrics
+    updateCounter = prometheus.NewCounter(prometheus.CounterOpts{
+        Name: "weatherstation_updates_total",
+        Help: "Total number of weather station updates",
+    })
+    registry.MustRegister(updateCounter)
+
     baromin = prometheus.NewGaugeVec(prometheus.GaugeOpts{
         Name: "weatherstation_barometric_pressure",
         Help: "Barometric pressure in millibar",
@@ -118,6 +125,9 @@ func updateWeatherStation(w http.ResponseWriter, r *http.Request) {
     // Update metrics
     mutex.Lock()
     defer mutex.Unlock()
+
+    // Increment the update counter
+    updateCounter.Inc()
 
     barominValue := parseFloat(query.Get("baromin"))
     temperatureValue := parseFloat(query.Get("tempf"))
